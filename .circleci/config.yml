@@ -1,0 +1,30 @@
+version: 2.1
+orbs:
+  docker: circleci/docker@1.5.0
+workflows:
+  build-and-push:
+    jobs:
+      - build-and-push:
+          context:
+            - docker
+          filters:
+            branches:
+              only: master
+
+jobs:
+  build-and-push:
+    machine: true
+    steps:
+      - checkout
+      - docker/install-docker-tools
+      - run:
+          name: Login to Docker
+          command: docker login -u=$DOCKER_LOGIN -p=$DOCKER_PASSWORD registry.dsprojects.pl
+      - docker/build:
+          image: predicter
+          registry: registry.dsprojects.pl
+          tag: latest
+      - docker/push:
+          image: predicter
+          registry: registry.dsprojects.pl
+          tag: latest
